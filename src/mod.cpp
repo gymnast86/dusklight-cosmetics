@@ -380,6 +380,15 @@ ModResult build_panel(ModContext*, UiElementHandle panel, void*, ModError*) {
 }
 }  // namespace
 
+// Checks to see if this hash is already used by any of the existing replacements.
+// This accounts for when there are two textures with the same name, but
+// different hashes that we want to recolor.
+bool hash_is_already_used(uint64_t hash, const char* textureName, const std::list<TextureReplacementData>& replacements) {
+    return std::ranges::any_of(replacements, [=](const auto& replacement){
+        return replacement.key.texture_hash == hash && !strcmp(replacement.textureName, textureName);
+    });
+}
+
 void load_base_texture_data() {
     // Go through each texture we can recolor and attempt to load and store
     // the texture data for future recoloring
@@ -439,6 +448,13 @@ void load_base_texture_data() {
                             imageHeader->format, imageHeader->width, imageHeader->height, 1);
                         auto textureHash =
                             XXH64(replacement.baseTextureData.data(), baseMipSize, 0);
+
+                        // If a different replacement for this same set is already using this hash,
+                        // then reset our key and search for another one
+                        if (hash_is_already_used(textureHash, replacement.textureName, replacements)) {
+                            key = TEXTURE_KEY_INIT;
+                            continue;
+                        }
                         replacement.key.texture_hash = textureHash;
 
                         mods::log::debug("Loaded base texture data for {}. size: {:X} hash: {:X}",

@@ -622,6 +622,14 @@ std::unordered_map<ConfigVarHandle, std::list<TextureReplacementData>>& get_text
                 }
             }},
             {get_cvars().wolfLinkColor, {
+                // There are two separate wolf link body textures
+                // with the same name but different hashes that get used
+                // at various times
+                {
+                    .arc = "Wmdl",
+                    .modelFileName = "wl.bmd",
+                    .textureName = "wl_body",
+                },
                 {
                     .arc = "Wmdl",
                     .modelFileName = "wl.bmd",
