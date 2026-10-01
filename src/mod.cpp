@@ -384,7 +384,7 @@ ModResult build_panel(ModContext*, UiElementHandle panel, void*, ModError*) {
 // This accounts for when there are two textures with the same name, but
 // different hashes that we want to recolor.
 bool hash_is_already_used(uint64_t hash, const char* textureName, const std::list<TextureReplacementData>& replacements) {
-    return std::ranges::any_of(replacements, [=](const auto& replacement){
+    return std::ranges::any_of(replacements, [&](const auto& replacement){
         return replacement.key.texture_hash == hash && !strcmp(replacement.textureName, textureName);
     });
 }
